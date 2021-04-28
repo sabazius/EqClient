@@ -1,10 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace EqClient.Services
 {
     public class CalculationService
     {
+        private readonly ILogger<CalculationService> _logger;
+
+        public CalculationService()
+        {
+            
+        }
+
+
+        public async Task ProcessMessage(string message)
+        {
+            _logger.LogInformation(message);
+        }
+
         private Dictionary<char, int> GetVariables(string formula, List<int> values)
         {
             if (string.IsNullOrEmpty(formula)) return new Dictionary<char, int>();
