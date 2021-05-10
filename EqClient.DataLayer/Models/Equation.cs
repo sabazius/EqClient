@@ -1,4 +1,5 @@
-﻿using MessagePack;
+﻿using System.Collections.Generic;
+using MessagePack;
 
 namespace EqClient.DataLayer.Models
 {
@@ -12,6 +13,9 @@ namespace EqClient.DataLayer.Models
         public string EqMethod { get; set; }
 
         [Key(2)]
+        public List<int> Values { get; set; }
+
+        [Key(3)]
         public int Result { get; set; }
     }
 }

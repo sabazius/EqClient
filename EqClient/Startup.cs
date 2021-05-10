@@ -1,3 +1,4 @@
+using EqClient.DataLayer.DataFlow;
 using EqClient.DataLayer.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,6 +21,7 @@ namespace EqClient
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHostedService<DataConsumer>();
+            services.AddSingleton<ICalculationDataFlow, CalculationDataFlow>();
 
             services.AddControllers();
         }

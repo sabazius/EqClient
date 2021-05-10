@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Dataflow\" />
     <Folder Include="Kafka\Interfaces\" />
   </ItemGroup>
 
