@@ -28,22 +28,9 @@ namespace EqClient.DataLayer.Kafka
                 FetchWaitMaxMs = 50,
                 BootstrapServers = "localhost:9092",
                 GroupId = $"EqClient",
-                AutoOffsetReset = AutoOffsetReset.Earliest
+                AutoOffsetReset = AutoOffsetReset.Latest,
+                ClientId = "2"
             };
-        }
-
-        private Message<long, object> ExecuteQuery()
-        {
-            using var consumer = new ConsumerBuilder<int, byte[]>(_kafkaConfig)
-                //.SetValueDeserializer(new MsgPackDeserializer<CalculationPack>())
-                .Build();
-
-            consumer.Subscribe("data");
-
-            while (true)
-            {
-                consumer.Position(new TopicPartition("data", 2));
-            }
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -56,16 +43,7 @@ namespace EqClient.DataLayer.Kafka
 
                try
                {
-                   //consumer.Subscribe("data");
-
-                   //consumer.Position(new TopicPartition("data",0));// Assign(new TopicPartition("data", 0));
-                   consumer.Assign(new TopicPartitionOffset("data", 0, 19));
-                   //consumer.Seek(new TopicPartitionOffset(new TopicPartition("data", 0),4));
-                   //var consumeR = consumer.Consume(stoppingToken);
-
-                   //var consumeResult = consumer.Consume(stoppingToken);
-
-                   //_calculationDataFlow.ProcessMessage(consumeResult.Message.Value);
+                   consumer.Subscribe("data");
 
                    while (!stoppingToken.IsCancellationRequested)
                    {
