@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using EqClient.DataLayer.Helpers;
 using EqClient.DataLayer.Models;
 using MessagePack;
 using System.Threading.Tasks.Dataflow;
+using EqClient.DataLayer.Kafka;
 using Microsoft.Extensions.Logging;
 
 namespace EqClient.DataLayer.DataFlow
@@ -14,10 +16,12 @@ namespace EqClient.DataLayer.DataFlow
         private TransformBlock<byte[], CalculationPack> _deserializeBlock;
         private TransformBlock<CalculationPack, CalculationPack> _calculationBlock;
         private ActionBlock<CalculationPack> _publishBlock;
+        private readonly IResultProducer _resultProducer;
 
-        public CalculationDataFlow(ILogger<CalculationDataFlow> logger)
+        public CalculationDataFlow(ILogger<CalculationDataFlow> logger, IResultProducer resultProducer)
         {
             _logger = logger;
+            _resultProducer = resultProducer;
 
             _deserializeBlock = new TransformBlock<byte[], CalculationPack>(msg => MessagePackSerializer.Deserialize<CalculationPack>(msg));
 
@@ -42,7 +46,7 @@ namespace EqClient.DataLayer.DataFlow
                     _logger.LogInformation($"PackId: {eq.CalcPackId} EqId: {eq.Equation.Id} Result:{eq.Equation.Result}");
                 }
 
-                var result = pack;
+                _resultProducer.ProduceResultAsync(pack);
             });
 
             var linkOptions = new DataflowLinkOptions()

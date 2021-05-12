@@ -1,13 +1,11 @@
 ﻿using Confluent.Kafka;
+using EqClient.DataLayer.DataFlow;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using EqClient.DataLayer.Common;
-using System.Text;
-using EqClient.DataLayer.DataFlow;
-using EqClient.DataLayer.Models;
 using Newtonsoft.Json;
 
 namespace EqClient.DataLayer.Kafka
@@ -61,44 +59,44 @@ namespace EqClient.DataLayer.Kafka
                    //consumer.Subscribe("data");
 
                    //consumer.Position(new TopicPartition("data",0));// Assign(new TopicPartition("data", 0));
-                   consumer.Assign(new TopicPartitionOffset("data", 0, 3));
+                   consumer.Assign(new TopicPartitionOffset("data", 0, 19));
                    //consumer.Seek(new TopicPartitionOffset(new TopicPartition("data", 0),4));
                    //var consumeR = consumer.Consume(stoppingToken);
 
-                   var consumeResult = consumer.Consume(stoppingToken);
+                   //var consumeResult = consumer.Consume(stoppingToken);
 
-                   _calculationDataFlow.ProcessMessage(consumeResult.Message.Value);
+                   //_calculationDataFlow.ProcessMessage(consumeResult.Message.Value);
 
-                   //while (!stoppingToken.IsCancellationRequested)
-                   //{
-                   //    try
-                   //    {
-                   //        var consumeResult = consumer.Consume(stoppingToken);
+                   while (!stoppingToken.IsCancellationRequested)
+                   {
+                       try
+                       {
+                           var consumeResult = consumer.Consume(stoppingToken);
 
-                   //        try
-                   //        {
-                   //            _calculationDataFlow.ProcessMessage(consumeResult.Message.Value);
+                           try
+                           {
+                               _calculationDataFlow.ProcessMessage(consumeResult.Message.Value);
 
-                   //            _logger.LogInformation(consumeResult.Message.Key.ToString());
-                   //        }
-                   //        catch (Exception ex)
-                   //        {
-                   //            _logger.LogError(ex, "Kafka consume message error: {0}", ex.Message);
-                   //        }
+                               _logger.LogInformation(consumeResult.Message.Key.ToString());
+                           }
+                           catch (Exception ex)
+                           {
+                               _logger.LogError(ex, "Kafka consume message error: {0}", ex.Message);
+                           }
 
-                   //        if (consumeResult.IsPartitionEOF)
-                   //            break;
+                           if (consumeResult.IsPartitionEOF)
+                               break;
 
-                   //    }
-                   //    catch (ConsumeException e)
-                   //    {
-                   //        _logger.LogError(e, $"Consumer for topic '{e.ConsumerRecord.Topic}'. ConsumeException, Key: {Encoding.UTF8.GetString(e.ConsumerRecord.Message.Key)}, Error: {JsonConvert.SerializeObject(e.Error)}");
-                   //    }
-                   //    catch (Exception ex)
-                   //    {
-                   //        _logger.LogError(ex, "Kafka consume message error: {0}", ex.Message);
-                   //    }
-                   //}
+                       }
+                       catch (ConsumeException e)
+                       {
+                           _logger.LogError(e, $"Consumer for topic '{e.ConsumerRecord.Topic}'. ConsumeException, Key: {Encoding.UTF8.GetString(e.ConsumerRecord.Message.Key)}, Error: {JsonConvert.SerializeObject(e.Error)}");
+                       }
+                       catch (Exception ex)
+                       {
+                           _logger.LogError(ex, "Kafka consume message error: {0}", ex.Message);
+                       }
+                   }
                }
                catch (OperationCanceledException e)
                {
